@@ -1,0 +1,95 @@
+<!doctype html>
+<html><head>
+    <script src="../vendor/jquery.min.js"></script>
+    <script src="../vendor/sockjs.min.js"></script>
+    <script src="../vendor/autobahn.js"></script>
+    <script src="../lib/phpsock.js"></script>
+    <style>
+      .box {
+          width: 600px;
+          float: left;
+          margin: 0 20px 0 20px;
+      }
+      .box div, .box input {
+          border: 1px solid;
+          -moz-border-radius: 4px;
+          border-radius: 4px;
+          width: 100%;
+          padding: 0px;
+          margin: 5px;
+      }
+      .box div {
+          border-color: grey;
+          height: 300px;
+          overflow: auto;
+          padding: 6px;
+      }
+      .box input {
+          height: 30px;
+      }
+      h1 {
+          margin-left: 30px;
+      }
+      body {
+          background-color: #F0F0F0;
+          font-family: "Arial";
+      }
+    </style>
+</head><body lang="en">
+    <h1>PHPsock client demo</h1>
+
+    <div id="first" class="box">
+      <div></div>
+      <form><input autocomplete="off" value="Type here..."></input></form>
+    </div>
+
+    <script>
+
+
+        var connection = PhpSock('http://afrodita.ebrana.cz:9000/broadcast', function (sess) {
+            
+            sess.subscribe('http://ebrana.cz/news', function(topic, data){
+                log('[PubSub] '+topic+' : '+JSON.stringify(data));
+            });
+
+            sess.subscribe('http://ebrana.cz/chat', function(topic, data){
+                log('[Chat] '+topic+' : '+JSON.stringify(data));
+            });
+
+            sess.on('test', function(pars){
+                log('[RPC] test : '+JSON.stringify(pars));
+                return 'testresult';
+            })
+
+            sess.publish('http://ebrana.cz/news', {a:11});
+
+            sess.call('isEven', 1).then(function(result){});
+            // sess.call('isEven', 2).then(function(result){});
+
+
+        },function (code, reason, detail) {
+            log('[error] '+reason);
+        });
+
+        function log(text) {
+          $('#first > div').append(text+'<br />');
+        }
+
+        $(function(){
+          $('#first form input').keypress(function(e){
+            var $input = $(this);
+            if (e.which == 13) {
+              connection.ifConnected(function(sess){
+                sess.publish('http://ebrana.cz/chat', $input.val());
+                $input.val('');
+              })
+              return false;
+            }
+          }).focus(function(){
+            if ($(this).val() == 'Type here...')
+              $(this).val('');
+          })
+        })
+
+    </script>
+</body></html>
