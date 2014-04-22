@@ -7,5 +7,5 @@ Other parts of library
 ----------------------
 
   * [PHPsock-broker](https://github.com/dvorakjan/phpsock-broker) Node.js broker daemon
-  * [PHPsock-server](https://github.com/dvorakjan/phpsock-server) PHP api
+  * [PHPsock-connector](https://github.com/dvorakjan/phpsock-connector) PHP connector
   * [PHPsock-client](https://github.com/dvorakjan/phpsock-client) JavaScript client library
